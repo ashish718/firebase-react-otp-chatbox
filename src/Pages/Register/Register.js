@@ -2,11 +2,13 @@ import React, {useState} from 'react';
 import firebase from '../../Services/firebase';
 import {Link} from 'react-router-dom';
 
-const Register = ()=>{
+const Register = (props)=>{
 
 
   const [phone, setPhone] = useState()
   const [otp, setOtp] = useState()
+
+  
 
   const submit = e=>{
     e.preventDefault()
@@ -19,7 +21,8 @@ const Register = ()=>{
     let code = prompt('enter the otp', '')
     if (code==null) return;
     e.confirm(code).then(result=>{
-      console.log('user', result.user);
+      // console.log('user', result.user);
+      props.history.push('/chat')
     })
     .catch(error=>{
       console.log("Error is ", error);
@@ -31,10 +34,12 @@ const Register = ()=>{
 
   return(
     <div>
+    <div id="recaptcha-container"></div>
       <form className="form" onSubmit={submit}>
         <input type="number" onChange={e=>setPhone('+91'+e.target.value)} className="telephone" maxLength="10" pattern="{0-9}{10}" placeholder="enter mobile no." required/>
+
         <button className="btn btn-primary">Send Otp</button>
-        <div id="recaptcha-container"></div>
+
       </form>
     </div>
   )
