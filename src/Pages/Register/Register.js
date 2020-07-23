@@ -15,7 +15,7 @@ useEffect(()=>{
     props.showToast(1, 'Login Success')
     props.history.push('/chat')
   }
-})
+},[])
 
   const submit = e=>{
     e.preventDefault()
