@@ -62,7 +62,7 @@ useEffect(()=>{
             .add({
               id:result.user.uid,
               phoneno,
-              firstname:'test',
+              firstname:'',
               lastname:'',
               url:'',
               messages:[{notificationId:'', number:0}]
