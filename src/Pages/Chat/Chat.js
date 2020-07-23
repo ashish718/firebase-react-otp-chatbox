@@ -20,12 +20,12 @@ let currentUserMessages = [];
 let searchUsers = [];
 let notificationMessagesErase = []
 
-// useEffect(()=>{
-// if (!localStorage.getItem("docid")) {
-//   props.showToast(0, 'Login failed')
-//   props.history.push('/')
-// }
-// },[])
+useEffect(()=>{
+if (!localStorage.getItem("docid")) {
+  props.showToast(0, 'Login failed')
+  props.history.push('/')
+}
+},[])
 
 
 useEffect(()=>{
