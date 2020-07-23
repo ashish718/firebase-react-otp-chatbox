@@ -1,14 +1,21 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import firebase from '../../Services/firebase';
 import {Link} from 'react-router-dom';
 import LoginString from './LoginString'
-const Register = (props)=>{
 
+
+
+const Register = (props)=>{
 
   const [phoneno, setPhone] = useState()
   const [otp, setOtp] = useState()
 
-
+useEffect(()=>{
+  if (localStorage.getItem(LoginString.ID)) {
+    props.showToast(1, 'Login Success')
+    props.history.push('/chat')
+  }
+})
 
   const submit = e=>{
     e.preventDefault()
@@ -21,17 +28,22 @@ const Register = (props)=>{
     let code = prompt('enter the otp', '')
     if (code==null) return;
     e.confirm(code).then( async result=>{
-      // console.log('user', result.user);
+       console.log('user', result.user);
+       console.log('user', result.user.uid);
       let user = result.user
+      console.log(user, "user");
+      console.log(user.uid);
       if (user) {
         await firebase.firestore().collection('users')
         .where('id', '==', user.uid)
         .get()
-        .then(userData=>{
-          console.log("userData", userData);
-          if (userData) {
+        .then(querySnapshot=>{
+          console.log("userData", querySnapshot);
+          console.log("userData .data");
+          const datass = querySnapshot.docs.map(doc => doc.data());
+          if (datass.length>0) {
 
-              userData.forEach((doc)=>{
+              querySnapshot.forEach((doc)=>{
                 console.log("doc", doc);
 
                 const currentData = doc.data();

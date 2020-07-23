@@ -41,7 +41,7 @@ const showToast = (type, message)=>{
         />
 
         <Switch>
-          <Route exact path='/' render={props=> <Register {...props}/>}/>
+          <Route exact path='/' render={props=> <Register showToast={showToast}{...props}/>}/>
           <Route exact path='/profile' render={props=> <Profile showToast={showToast}{...props}/>}/>
           <Route exact path='/chat' render={props=> <Chat showToast={showToast}{...props}/>}/>
 
