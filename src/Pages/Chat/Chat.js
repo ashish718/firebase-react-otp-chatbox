@@ -3,6 +3,9 @@ import LoginString from '../Register/LoginString';
 import './Chat.css';
 import firebase from '../../Services/firebase';
 import ReactLoading from 'react-loading'
+import ChatBox from '../ChatBox/ChatBox'
+import Welcome from '../Welcome/Welcome'
+
 
 const Chat = (props)=>{
 
@@ -15,32 +18,34 @@ const [currentUserId, setCurrentUserId] = useState(localStorage.getItem("id"))
 
 const [currentPeerUser, setCurrentPeerUser] = useState(null);
 const [displayContactSwitchedNotification, setdisplayContactSwitchedNotification] = useState([])
-const [displayedContacts, setDisplayedContacts] = useState([])
+let [displayedContacts, setDisplayedContacts] = useState([])
+
 let currentUserMessages = [];
 let searchUsers = [];
 let notificationMessagesErase = []
 
-useEffect(()=>{
-if (!localStorage.getItem("docid")) {
-  props.showToast(0, 'Login failed')
-  props.history.push('/')
-}
-},[])
 
 
 useEffect(()=>{
-  firebase.firestore().collection('users').doc(userDocumentId).get()
-  .then((doc)=>{
-    doc.data().messages.map((item)=>{
-      currentUserMessages.push({
-        notificationId: item.notificationId,
-        number: item.number
+  if (!localStorage.getItem("docid")) {
+    props.showToast(0, 'Login failed')
+    props.history.push('/')
+  }
+  else{
+    firebase.firestore().collection('users').doc(userDocumentId).get()
+    .then((doc)=>{
+      doc.data().messages.map((item)=>{
+        currentUserMessages.push({
+          notificationId: item.notificationId,
+          number: item.number
+        })
       })
+      setdisplayContactSwitchedNotification(currentUserMessages)
     })
-    setdisplayContactSwitchedNotification(currentUserMessages)
-  })
-  getListuser()
-  console.log("useEffect");
+    getListuser()
+    console.log("useEffect");
+  }
+
 },[])
 
 
@@ -62,7 +67,7 @@ const getListuser = async () =>{
 
   }
   renderListUser();
-
+  console.log(searchUsers);
 }
 
 const notificationErase= (itemId)=>{
@@ -176,6 +181,62 @@ const profileClick = () =>{
 }
 
 
+const searchHandler = async e =>{
+  let searchQuery = e.target.value.toLowerCase();
+  displayedContacts = searchUsers.filter(el=>{
+    return el.firstname.toLowerCase().indexOf(searchQuery)
+  })
+  console.log(displayedContacts);
+  setDisplayedContacts(displayedContacts)
+  displaySearchContacts()
+
+}
+
+const displaySearchContacts = () =>{
+  if (searchUsers.length>0) {
+    let viewListUser = [];
+    let classname = "";
+    displayedContacts.map(item=>{
+      if (item.id !== currentUserId) {
+        classname = getClassnameforUserandNotification(item.id)
+        viewListUser.push(
+          <button
+          id={item.key}
+          className={classname}
+          onClick={()=>{ notificationErase(item.id)
+                          setCurrentPeerUser(item)
+                          document.getElementById(item.key).style.backgroundColor="#fff"
+                          document.getElementById(item.key).style.color="#fff"
+          }}
+          >
+          <img
+          className="viewAvatarItem"
+          src = {item.url}
+          alt=""
+          />
+          <div className="viewWrapContentItem">
+            <span className="textItem">
+              {item.phoneno}
+            </span>
+          </div>
+
+          {classname === "viewWrapItemNotification"?
+            (
+            <div className="notificationpragraph">
+              <p id={item.key} className="newmessages">New Messages</p>
+            </div>
+          ):null
+          }
+          </button>
+        )
+      }
+    })
+    setDisplayedContacts(viewListUser)
+  }
+  else {
+    console.log("no user is present");
+  }
+}
 
   return(
     <div className="root">
@@ -189,8 +250,23 @@ const profileClick = () =>{
             onClick={profileClick}/>
             <button className="Logout" onClick={logout}>Logout</button>
           </div>
+          <div className="rootsearchbar">
+            <div className="input-container">
+              <input className="input-field" type="text" onChange={searchHandler} placeholder="search"/>
+
+            </div>
+          </div>
+
           {displayedContacts}
         </div>
+
+        <div className="viewBoard">
+          {currentPeerUser? (
+            <ChatBox/>
+          ):(<Welcome currentUserPhoto={userPhoto} currentUserPhoneno={phoneno} currentUserName={firstname +' '+lastname}/>)}
+        </div>
+
+
       </div>
     </div>
   )

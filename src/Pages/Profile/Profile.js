@@ -44,9 +44,9 @@ console.log(e.target.files[0]);
 }
 
 const uploadAvatar = () =>{
-  console.log(url);
+  console.log(url===null);
   setIsLoading(true)
-  if (url) {
+  if (url===null) {
     const uploadTask  = firebase.storage()
     .ref()
     .child(id)
@@ -70,16 +70,22 @@ const uploadAvatar = () =>{
 }
 
 const updateUserInfo =async  (isUpdatePhotoURL, downloadURL)=>{
-  console.log(isUpdatePhotoURL, downloadURL);
-  let newinfo;
+  let newinfo={};
 
   if (isUpdatePhotoURL===true) {
     console.log("if condition");
+
+    console.log({firstname:firstname,
+    lastname:lastname,
+    url: downloadURL.toString()
+  });
+
     newinfo = await {
       firstname:firstname,
       lastname:lastname,
       url: downloadURL.toString()
     }
+    console.log({newinfo});
   }
   else {
     newinfo = await {
@@ -88,21 +94,22 @@ const updateUserInfo =async  (isUpdatePhotoURL, downloadURL)=>{
 
     }
     console.log(newinfo);
-    await firebase.firestore().collection('users')
-    .doc(documentKey)
-    .update(newinfo)
-    .then(data=>{
-      console.log("then");
-      console.log(data.doc.data());
-      localStorage.setItem("firstname", firstname)
-      localStorage.setItem("lastname", lastname)
-      if (isUpdatePhotoURL===true) {
-        localStorage.setItem("photourl", downloadURL)
-      }
-      setIsLoading(false)
-      props.showToast(1, "updated SuccessFully")
-    })
+
   }
+  await firebase.firestore().collection('users')
+  .doc(documentKey)
+  .update(newinfo)
+  .then(sdata=>{
+    console.log("then");
+
+    localStorage.setItem("firstname", firstname)
+    localStorage.setItem("lastname", lastname)
+    if (isUpdatePhotoURL===true) {
+      localStorage.setItem("photourl", downloadURL)
+    }
+    setIsLoading(false)
+    props.showToast(1, "updated SuccessFully")
+  })
 
 }
 
@@ -131,10 +138,10 @@ const updateUserInfo =async  (isUpdatePhotoURL, downloadURL)=>{
                />
       </div>
 
-      <span className="textLabel1">First Name</span>
+      <span className="textLabel1" style={{marginTop:"40px"}}>First Name</span>
       <input className="textInput" value={firstname?firstname:''} placeholder="Enter First Name" onChange={(e)=>setFirstName(e.target.value)}/>
 
-      <span className="textLabel1">Last Name</span>
+      <span className="textLabel1" style={{marginTop:"20px"}}>Last Name</span>
       <input className="textInput" value={lastname?lastname:''} placeholder="Enter Last Name" onChange={(e)=>setLastName(e.target.value)}/>
 
       <div>
